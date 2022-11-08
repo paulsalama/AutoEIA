@@ -8,10 +8,15 @@ license = "GPL-3.0-or-later"
 [tool.poetry.dependencies]
 python = "^3.9"
 aws-cdk-lib = "2.50.0"
+"aws-cdk.aws-apigatewayv2-alpha" = "2.50.0-alpha.0"
+"aws-cdk.aws-apigatewayv2-integrations-alpha" = "2.50.0-alpha.0"
+"aws-cdk.aws-lambda-python-alpha" = "2.50.0-alpha.0"
 constructs = "^10"
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.5"
+black = "^22.10.0"
+mypy = "^0.990"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
