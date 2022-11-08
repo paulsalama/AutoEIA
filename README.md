@@ -2,6 +2,16 @@
 
 Automated Environmental Impact Assessment - Code and Architecture
 
+## Quick Start
+
+You must have the [AWS CDK](https://github.com/aws/aws-cdk) and
+[Poetry](https://python-poetry.org/docs/) installed on your development machine.
+
+```
+poetry install
+poetry run cdk synth
+```
+
 ## Useful commands
 
 - `cdk ls` list all stacks in the app
