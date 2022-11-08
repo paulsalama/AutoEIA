@@ -21,28 +21,47 @@ def json_response(status, body=None):
     }
 
 
+def create_job():
+    item = {
+        "id": str(uuid4()),
+        "status": "NOT_STARTED",
+        "inputs": {},
+        "type": "NO_OP",
+    }
+    job_table.put_item(Item=item)
+    return json_response(201, {"job": item})
+
+
+def get_job(job_id):
+    response = job_table.get_item(Key={"id": job_id})
+    return json_response(200, {"job": response["Item"]})
+
+
+def complete_job(job_id):
+    response = job_table.update_item(
+        Key={"id": job_id},
+        UpdateExpression="SET #status = :val, outputs = :empty",
+        ExpressionAttributeNames={"#status": "status"},
+        ExpressionAttributeValues={":val": "SUCCEEDED", ":empty": {}},
+        ReturnValues="ALL_NEW",
+    )
+    return json_response(200, {"job": response["Attributes"]})
+
+
+handler_mapping = {
+    "POST /jobs": lambda event, context: create_job(),
+    "GET /jobs/{id}": lambda event, context: get_job(event["pathParameters"]["id"]),
+    "POST /jobs/{id}/complete": lambda event, context: complete_job(
+        event["pathParameters"]["id"]
+    ),
+}
+
+
 def handler(event, context):
-    rk = event["routeKey"]
-    if rk == "POST /jobs":
-        item = {
-            "id": str(uuid4()),
-            "status": "NOT_STARTED",
-            "inputs": {},
-            "type": "NO_OP",
-        }
-        job_table.put_item(Item=item)
-        return json_response(201, {"job": item})
-    elif rk == "GET /jobs/{id}":
-        response = job_table.get_item(Key={"id": event["pathParameters"]["id"]})
-        return json_response(200, {"job": response["Item"]})
-    elif rk == "POST /jobs/{id}/complete":
-        response = job_table.update_item(
-            Key={"id": event["pathParameters"]["id"]},
-            UpdateExpression="SET #status = :val, outputs = :empty",
-            ExpressionAttributeNames={"#status": "status"},
-            ExpressionAttributeValues={":val": "SUCCEEDED", ":empty": {}},
-            ReturnValues="ALL_NEW",
+    route_handler = handler_mapping.get(event["routeKey"], None)
+    if route_handler is None:
+        return json_response(
+            400, {"message": f"Unsupported route: {event['routeKey']}."}
         )
-        return json_response(200, {"job": response["Attributes"]})
-    else:
-        return json_response(400, {"message": f"Unsupported route: {rk}."})
+
+    return route_handler(event, context)
