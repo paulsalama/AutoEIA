@@ -2,6 +2,14 @@
 
 Automated Environmental Impact Assessment - Code and Architecture
 
+## Useful commands
+
+- `cdk ls` list all stacks in the app
+- `cdk synth` emits the synthesized CloudFormation template
+- `cdk deploy` deploy this stack to your default AWS account/region
+- `cdk diff` compare deployed stack with current state
+- `cdk docs` open CDK documentation
+
 ## Design
 
 ### Glossary
@@ -27,7 +35,7 @@ See the automatically-generated documentation for a more detailed description of
 the endpoints, as well as the specific analysis types supported.
 
 Infrastructure is modeled using the AWS CDK in Python. Dependencies are managed
-using `poetry`. 
+using `poetry`.
 
 ### Data Storage
 
@@ -44,7 +52,6 @@ Job:
 
 ## TODO:
 
-[ ] Shop around for existing Job Management solutions
-[ ] Implement Job Queue
-[ ] Implement permissionless API (`POST /jobs`, `GET /jobs/:id`, `POST /jobs/:id/complete`)
-[ ] Implement permissioned API
+[ ] Shop around for existing Job Management solutions [ ] Implement Job Queue [
+] Implement permissionless API (`POST /jobs`, `GET /jobs/:id`,
+`POST /jobs/:id/complete`) [ ] Implement permissioned API
