@@ -2,7 +2,7 @@ from pathlib import Path
 
 import aws_cdk.aws_apigatewayv2_alpha as apigwv2
 import aws_cdk.aws_lambda as lambda_
-from aws_cdk import Stack
+from aws_cdk import Stack, Tags
 from aws_cdk.aws_apigatewayv2_integrations_alpha import HttpLambdaIntegration
 from aws_cdk.aws_lambda_python_alpha import PythonFunction
 from constructs import Construct
@@ -13,6 +13,7 @@ DIR = Path(__file__).parent.resolve()
 class InfrastructureStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+        Tags.of(self).add("Application", "AutoEIA")
 
         jobs_handler = PythonFunction(
             self,
@@ -26,7 +27,7 @@ class InfrastructureStack(Stack):
             "JobsHandlerIntegration", jobs_handler
         )
 
-        http_api = apigwv2.HttpApi(self, "Api")
+        http_api = apigwv2.HttpApi(self, "AutoEIAAPI")
 
         http_api.add_routes(
             path="/jobs",
