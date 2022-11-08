@@ -12,11 +12,13 @@ aws-cdk-lib = "2.50.0"
 "aws-cdk.aws-apigatewayv2-integrations-alpha" = "2.50.0-alpha.0"
 "aws-cdk.aws-lambda-python-alpha" = "2.50.0-alpha.0"
 constructs = "^10"
+boto3 = "^1.26.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.5"
 black = "^22.10.0"
 mypy = "^0.990"
+pylint = "^2.15.5"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

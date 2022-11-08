@@ -69,6 +69,13 @@ Job:
 
 ## TODO:
 
-[ ] Shop around for existing Job Management solutions [ ] Implement Job Queue [
-] Implement permissionless API (`POST /jobs`, `GET /jobs/:id`,
-`POST /jobs/:id/complete`) [ ] Implement permissioned API
+[ ] Shop around for existing Job Management solutions
+
+[X] Implement Job Queue
+
+[ ] Implement a sample job type with schema validation
+
+[X] Implement permissionless API (`POST /jobs`, `GET /jobs/:id`,
+`POST /jobs/:id/complete`)
+
+[ ] Implement permissioned API

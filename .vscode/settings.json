@@ -1,5 +1,6 @@
 {
     "python.linting.enabled": true,
     "mypy.runUsingActiveInterpreter": true,
-    "python.linting.mypyEnabled": true
+    "python.linting.mypyEnabled": false,
+    "python.linting.pylintEnabled": true
 }
