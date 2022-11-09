@@ -1,9 +1,13 @@
 import os
 from uuid import uuid4
+from typing import Optional
 
 import boto3
 from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
 from mangum import Mangum
+from pydantic import BaseModel
+from enum import Enum
 
 JOB_TABLE_NAME = os.environ["JOB_TABLE_NAME"]
 
@@ -17,25 +21,39 @@ app = FastAPI(
 
 dynamodb = boto3.resource("dynamodb")
 
-job_table = dynamodb.Table(JOB_TABLE_NAME)
+job_table = dynamodb.Table(JOB_TABLE_NAME)  # type: ignore
+
+
+class JobStatus(Enum):
+    NOT_STARTED = "NOT_STARTED"
+    IN_PROGRESS = "IN_PROGRESS"
+    SUCCEEDED = "SUCCEEDED"
+    FAILED = "FAILED"
+
+
+class JobType(Enum):
+    NO_OP = "NO_OP"
+
+
+class Job(BaseModel):
+    id: str = str(uuid4())
+    status: JobStatus = JobStatus.NOT_STARTED
+    job_type: JobType = JobType.NO_OP
+    inputs: Optional[dict] = None
+    outputs: Optional[dict] = None
 
 
 @app.post("/jobs", status_code=201)
 def create_job():
-    item = {
-        "id": str(uuid4()),
-        "status": "NOT_STARTED",
-        "inputs": {},
-        "type": "NO_OP",
-    }
-    job_table.put_item(Item=item)
+    item = Job()
+    job_table.put_item(Item=jsonable_encoder(item))
     return {"job": item}
 
 
 @app.get("/jobs/{job_id}")
 def get_job(job_id: str):
     response = job_table.get_item(Key={"id": job_id})
-    return {"job": response["Item"]}
+    return {"job": Job(**response["Item"])}
 
 
 @app.post("/jobs/{job_id}/complete")
@@ -47,7 +65,7 @@ def complete_job(job_id: str):
         ExpressionAttributeValues={":val": "SUCCEEDED", ":empty": {}},
         ReturnValues="ALL_NEW",
     )
-    return {"job": response["Attributes"]}
+    return {"job": Job(**response["Attributes"])}
 
 
 handler = Mangum(app)

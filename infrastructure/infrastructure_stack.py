@@ -4,7 +4,6 @@ import aws_cdk.aws_apigateway as apigw
 import aws_cdk.aws_dynamodb as dynamodb
 import aws_cdk.aws_lambda as lambda_
 from aws_cdk import Stack, Tags
-from aws_cdk.aws_apigatewayv2_integrations_alpha import HttpLambdaIntegration
 from aws_cdk.aws_lambda_python_alpha import PythonFunction
 from constructs import Construct
 
@@ -36,4 +35,4 @@ class InfrastructureStack(Stack):
 
         table.grant_read_write_data(api_handler)
 
-        http_api = apigw.LambdaRestApi(self, "AutoEIARESTAPI", handler=api_handler)
+        apigw.LambdaRestApi(self, "AutoEIARESTAPI", handler=api_handler)  # type: ignore

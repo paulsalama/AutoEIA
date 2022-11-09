@@ -1,4 +1,9 @@
 {
     "python.linting.enabled": true,
-    "python.linting.pylintEnabled": true
+    "python.linting.pylintEnabled": true,
+    "mypy.runUsingActiveInterpreter": true,
+    "mypy.targets": [
+        "infrastructure",
+        "tests"
+    ]
 }
