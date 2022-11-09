@@ -1,21 +1,27 @@
-import os
-from typing import cast
 import json
+import os
 from decimal import Decimal
+from typing import Annotated, Literal, Union
 
 import boto3
 from fastapi import FastAPI
-from fastapi.encoders import jsonable_encoder
 from mangum import Mangum
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, parse_obj_as
 
-from .types.job import Job, JobInputs, JobOutputs, JobType, JobStatus
+from .types.job import JobStatus, JobType
 from .types.noop_job import NoOpJob, NoOpJobInputs, NoOpJobOutputs
 from .types.shadow_study_job import (
     ShadowStudyJob,
     ShadowStudyJobInputs,
     ShadowStudyJobOutputs,
 )
+
+Job = Annotated[Union[NoOpJob, ShadowStudyJob], Field(discriminator="job_type")]
+
+
+class JobWrapper(BaseModel):
+    job: Job
+
 
 JOB_TABLE_NAME = os.environ["JOB_TABLE_NAME"]
 
@@ -32,9 +38,20 @@ dynamodb = boto3.resource("dynamodb")
 job_table = dynamodb.Table(JOB_TABLE_NAME)  # type: ignore
 
 
-class CreateJobInput(BaseModel):
-    job_type: JobType
-    inputs: JobInputs
+class CreateShadowStudyJobInput(BaseModel):
+    job_type: Literal[JobType.SHADOW_STUDY] = JobType.SHADOW_STUDY
+    inputs: ShadowStudyJobInputs
+
+
+class CreateNoOpJobInput(BaseModel):
+    job_type: Literal[JobType.NO_OP] = JobType.NO_OP
+    inputs: NoOpJobInputs
+
+
+CreateJobInput = Annotated[
+    Union[CreateNoOpJobInput, CreateShadowStudyJobInput],
+    Field(discriminator="job_type"),
+]
 
 
 def ddb_encode(item: BaseModel):
@@ -43,40 +60,32 @@ def ddb_encode(item: BaseModel):
 
 @app.post("/jobs", status_code=201)
 def create_job(body: CreateJobInput):
-    item: Job
-    if body.job_type == JobType.SHADOW_STUDY:
-        item = ShadowStudyJob(inputs=cast(ShadowStudyJobInputs, body.inputs))
-    else:
-        item = NoOpJob(inputs=cast(NoOpJobInputs, body.inputs))
-    job_table.put_item(Item=ddb_encode(item))
-    return {"job": item}
+    item = JobWrapper(job={"job_type": body.job_type, "inputs": body.inputs})  # type: ignore
+    job_table.put_item(Item=ddb_encode(item.job))
+    return item
 
 
 @app.get("/jobs/{job_id}")
 def get_job(job_id: str):
     response = job_table.get_item(Key={"id": job_id})
-    return {"job": Job(**response["Item"])}
+    return parse_obj_as(JobWrapper, {"job": response["Item"]})
 
 
 class CompleteJobInput(BaseModel):
-    outputs: JobOutputs
+    outputs: Union[NoOpJobOutputs, ShadowStudyJobOutputs]
+
+    class Config:
+        smart_union = True
 
 
 @app.post("/jobs/{job_id}/complete")
 def complete_job(job_id: str, body: CompleteJobInput):
     response = job_table.get_item(Key={"id": job_id})
-    base_job = response["Item"]
-    item: Job
-    if base_job["job_type"] == JobType.SHADOW_STUDY.value:
-        print(base_job)
-        item = ShadowStudyJob.parse_raw(json.dumps(base_job))
-        item.outputs = cast(ShadowStudyJobOutputs, body.outputs)
-    else:
-        item = NoOpJob.parse_obj(base_job)
-        item.outputs = cast(NoOpJobOutputs, body.outputs)
-    item.job_status = JobStatus.SUCCEEDED
-    job_table.put_item(Item=ddb_encode(item))
-    return {"job": item}
+    item = parse_obj_as(JobWrapper, {"job": response["Item"]})
+    item.job.outputs = body.outputs  # type: ignore
+    item.job.job_status = JobStatus.SUCCEEDED
+    job_table.put_item(Item=ddb_encode(item.job))
+    return item
 
 
 handler = Mangum(app)
