@@ -24,6 +24,12 @@ black = "^22.10.0"
 mypy = "^0.990"
 pylint = "^2.15.5"
 
+[tool.mypy]
+plugins = "pydantic.mypy"
+
+[tool.pylint]
+extension-pkg-whitelist = "pydantic"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

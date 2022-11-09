@@ -5,5 +5,10 @@
     "mypy.targets": [
         "infrastructure",
         "tests"
-    ]
+    ],
+    "python.formatting.provider": "black",
+    "[python]": {
+        "editor.wordBasedSuggestions": false,
+        "editor.formatOnSave": true
+    }
 }
