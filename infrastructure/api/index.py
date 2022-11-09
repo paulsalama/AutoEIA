@@ -7,7 +7,13 @@ from mangum import Mangum
 
 JOB_TABLE_NAME = os.environ["JOB_TABLE_NAME"]
 
-app = FastAPI()
+app = FastAPI(
+    title="EIA REST API",
+    version="0.1.0",
+    license_info={
+        "name": "GPL-3.0-or-later",
+    },
+)
 
 dynamodb = boto3.resource("dynamodb")
 
