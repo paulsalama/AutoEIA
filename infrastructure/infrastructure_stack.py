@@ -1,6 +1,6 @@
 from pathlib import Path
 
-import aws_cdk.aws_apigatewayv2_alpha as apigwv2
+import aws_cdk.aws_apigateway as apigw
 import aws_cdk.aws_dynamodb as dynamodb
 import aws_cdk.aws_lambda as lambda_
 from aws_cdk import Stack, Tags
@@ -25,37 +25,15 @@ class InfrastructureStack(Stack):
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
         )
 
-        jobs_handler = PythonFunction(
+        api_handler = PythonFunction(
             self,
-            "JobsHandler",
-            entry=str(DIR / "handler_jobs"),
+            "APIHandler",
+            entry=str(DIR / "api"),
             architecture=lambda_.Architecture.ARM_64,
             runtime=lambda_.Runtime.PYTHON_3_9,
             environment={"JOB_TABLE_NAME": table.table_name},
         )
 
-        table.grant_read_write_data(jobs_handler)
+        table.grant_read_write_data(api_handler)
 
-        job_handler_integration = HttpLambdaIntegration(
-            "JobsHandlerIntegration", jobs_handler
-        )
-
-        http_api = apigwv2.HttpApi(self, "AutoEIAAPI")
-
-        http_api.add_routes(
-            path="/jobs",
-            methods=[apigwv2.HttpMethod.POST],
-            integration=job_handler_integration,
-        )
-
-        http_api.add_routes(
-            path="/jobs/{id}",
-            methods=[apigwv2.HttpMethod.GET],
-            integration=job_handler_integration,
-        )
-
-        http_api.add_routes(
-            path="/jobs/{id}/complete",
-            methods=[apigwv2.HttpMethod.POST],
-            integration=job_handler_integration,
-        )
+        http_api = apigw.LambdaRestApi(self, "AutoEIARESTAPI", handler=api_handler)
