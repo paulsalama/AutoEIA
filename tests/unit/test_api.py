@@ -1,21 +1,22 @@
-import os
-
+import boto3
 from pydantic import parse_obj_as
-
-os.environ["JOB_TABLE_NAME"] = "AutoEIAStack-TableCD117FA1-1IYIL0D055FND"
 
 from infrastructure.api.api_handler.index import (
     CompleteJobInput,
     CreateJobInput,
     JobStatus,
     JobType,
-    complete_job,
-    create_job,
-    get_job,
+    create_app,
 )
 
+JOB_TABLE_NAME = "AutoEIAStack-TableCD117FA1-1IYIL0D055FND"
 
-def test_jobs_handler():
+
+def test_api_handler():
+    dynamodb = boto3.resource("dynamodb")
+    job_table = dynamodb.Table(JOB_TABLE_NAME)
+    _, create_job, get_job, complete_job = create_app(job_table)
+
     response = create_job(
         body=parse_obj_as(
             CreateJobInput,

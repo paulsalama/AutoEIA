@@ -69,16 +69,4 @@ Job:
 
 ## TODO:
 
-[ ] Shop around for existing Job Management solutions
-
-[X] Implement Job Queue
-
-[ ] Implement a sample job type with schema validation
-
-[ ] Explore integrating the JSON schemas for each Job Type into a larger
-complete OpenAPI specification
-
-[X] Implement permissionless API (`POST /jobs`, `GET /jobs/:id`,
-`POST /jobs/:id/complete`)
-
 [ ] Implement permissioned API
