@@ -8,9 +8,9 @@ from fastapi import FastAPI
 from mangum import Mangum
 from pydantic import BaseModel, Field, parse_obj_as
 
-from .api_types.job import JobStatus, JobType
-from .api_types.noop_job import NoOpJob, NoOpJobInputs, NoOpJobOutputs
-from .api_types.shadow_study_job import (
+from .models.job import JobStatus, JobType
+from .models.noop_job import NoOpJob, NoOpJobInputs, NoOpJobOutputs
+from .models.shadow_study_job import (
     ShadowStudyJob,
     ShadowStudyJobInputs,
     ShadowStudyJobOutputs,

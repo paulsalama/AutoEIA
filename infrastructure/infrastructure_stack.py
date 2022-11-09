@@ -28,6 +28,7 @@ class InfrastructureStack(Stack):
             self,
             "APIHandler",
             entry=str(DIR / "api"),
+            index="api_handler/index.py",
             architecture=lambda_.Architecture.ARM_64,
             runtime=lambda_.Runtime.PYTHON_3_9,
             environment={"JOB_TABLE_NAME": table.table_name},

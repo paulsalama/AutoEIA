@@ -4,7 +4,7 @@ from pydantic import parse_obj_as
 
 os.environ["JOB_TABLE_NAME"] = "AutoEIAStack-TableCD117FA1-1IYIL0D055FND"
 
-from infrastructure.api.index import (
+from infrastructure.api.api_handler.index import (
     CompleteJobInput,
     CreateJobInput,
     JobStatus,
