@@ -16,6 +16,7 @@ boto3 = "^1.26.4"
 fastapi = "^0.86.0"
 mangum = "^0.16.0"
 pydantic = "^1.10.2"
+types-boto3 = "^1.0.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.5"
