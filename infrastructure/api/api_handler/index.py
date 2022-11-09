@@ -57,21 +57,22 @@ def create_app(job_table) -> tuple[FastAPI, Callable, Callable, Callable]:
         license_info={
             "name": "GPL-3.0-or-later",
         },
+        root_path="/prod",
     )
 
-    @app.post("/jobs", status_code=201)
-    def create_job(body: CreateJobInput):
+    @app.post("/jobs", status_code=201, response_model=JobWrapper)
+    def create_job(body: CreateJobInput) -> JobWrapper:
         item = JobWrapper(job={"job_type": body.job_type, "inputs": body.inputs})  # type: ignore
         job_table.put_item(Item=ddb_encode(item.job))
         return item
 
-    @app.get("/jobs/{job_id}")
-    def get_job(job_id: str):
+    @app.get("/jobs/{job_id}", response_model=JobWrapper)
+    def get_job(job_id: str) -> JobWrapper:
         response = job_table.get_item(Key={"id": job_id})
         return parse_obj_as(JobWrapper, {"job": response["Item"]})
 
-    @app.post("/jobs/{job_id}/complete")
-    def complete_job(job_id: str, body: CompleteJobInput):
+    @app.post("/jobs/{job_id}/complete", response_model=JobWrapper)
+    def complete_job(job_id: str, body: CompleteJobInput) -> JobWrapper:
         response = job_table.get_item(Key={"id": job_id})
         item = parse_obj_as(JobWrapper, {"job": response["Item"]})
         item.job.outputs = body.outputs  # type: ignore
