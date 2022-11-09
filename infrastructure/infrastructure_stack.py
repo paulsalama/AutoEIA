@@ -3,8 +3,8 @@ from pathlib import Path
 import aws_cdk.aws_apigateway as apigw
 import aws_cdk.aws_dynamodb as dynamodb
 import aws_cdk.aws_lambda as lambda_
-from aws_cdk import Stack, Tags
-from aws_cdk.aws_lambda_python_alpha import PythonFunction
+from aws_cdk import Stack, Tags, DockerImage
+from aws_cdk.aws_lambda_python_alpha import PythonFunction, BundlingOptions
 from constructs import Construct
 
 DIR = Path(__file__).parent.resolve()
@@ -31,6 +31,11 @@ class InfrastructureStack(Stack):
             architecture=lambda_.Architecture.ARM_64,
             runtime=lambda_.Runtime.PYTHON_3_9,
             environment={"JOB_TABLE_NAME": table.table_name},
+            bundling=BundlingOptions(
+                image=DockerImage.from_registry(
+                    "public.ecr.aws/sam/build-python3.9:1.61.0-20221103213531"
+                )
+            ),
         )
 
         table.grant_read_write_data(api_handler)
