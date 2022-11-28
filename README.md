@@ -56,7 +56,7 @@ using `poetry`.
 
 ### Data Storage
 
-Job metadata is stored in an DynamoDB instance. Its schema is the following:
+Job metadata is stored in an [DynamoDB](https://docs.aws.amazon.com/dynamodb/index.html) instance. Its schema is the following:
 
 ```yaml
 Job:
