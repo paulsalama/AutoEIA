@@ -24,6 +24,15 @@ class InfrastructureStack(Stack):
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
         )
 
+        # Allow querying for all jobs that are grouped by a parent ID
+        table.add_global_secondary_index(
+            index_name="ParentIDIndex",
+            partition_key=dynamodb.Attribute(
+                name="parent_id", type=dynamodb.AttributeType.STRING
+            ),
+            sort_key=dynamodb.Attribute(name="id", type=dynamodb.AttributeType.STRING),
+        )
+
         api_handler = PythonFunction(
             self,
             "APIHandler",
