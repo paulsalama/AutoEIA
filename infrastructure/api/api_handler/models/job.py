@@ -18,6 +18,10 @@ class JobType(str, Enum):
     SHADOW_STUDY = "SHADOW_STUDY"
 
 
+class BaseJobInput(BaseModel):
+    parent_id: Optional[str]
+
+
 class BaseJob(BaseModel, ABC):
     id: str = str(uuid4())
     """The unique identifier for this Job. Auto-populated as a UUIDV4."""

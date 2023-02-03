@@ -1,52 +1,19 @@
 import json
 import os
 from decimal import Decimal
-from typing import Annotated, Literal, Optional, Union, Callable
+from typing import Callable
 
 import boto3
 from boto3.dynamodb.conditions import Key
 from fastapi import FastAPI
 from mangum import Mangum
-from pydantic import BaseModel, Field, parse_obj_as
+from pydantic import BaseModel, parse_obj_as
 
-from .models.job import JobStatus, JobType
-from .models.noop_job import NoOpJob, NoOpJobInputs, NoOpJobOutputs
-from .models.shadow_study_job import (
-    ShadowStudyJob,
-    ShadowStudyJobInputs,
-    ShadowStudyJobOutputs,
-)
-
-Job = Annotated[Union[NoOpJob, ShadowStudyJob], Field(discriminator="job_type")]
+from .models import Job, JobStatus, CreateJobInput, CompleteJobInput
 
 
 class JobWrapper(BaseModel):
     job: Job
-
-
-class CreateShadowStudyJobInput(BaseModel):
-    parent_id: Optional[str]
-    job_type: Literal[JobType.SHADOW_STUDY] = JobType.SHADOW_STUDY
-    inputs: ShadowStudyJobInputs
-
-
-class CreateNoOpJobInput(BaseModel):
-    parent_id: Optional[str]
-    job_type: Literal[JobType.NO_OP] = JobType.NO_OP
-    inputs: NoOpJobInputs
-
-
-CreateJobInput = Annotated[
-    Union[CreateNoOpJobInput, CreateShadowStudyJobInput],
-    Field(discriminator="job_type"),
-]
-
-
-class CompleteJobInput(BaseModel):
-    outputs: Union[NoOpJobOutputs, ShadowStudyJobOutputs]
-
-    class Config:
-        smart_union = True
 
 
 def ddb_encode(item: BaseModel):
