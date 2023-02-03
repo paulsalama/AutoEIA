@@ -12,12 +12,13 @@ from .shadow_study_job import (
 )
 
 JobInput = Union[NoOpJobInputs, ShadowStudyJobInputs]
-JobOutput = Union[NoOpJobOutputs, ShadowStudyJobOutputs]
 
 CreateJobInput = Annotated[
     Union[CreateNoOpJobInput, CreateShadowStudyJobInput],
     Field(discriminator="job_type"),
 ]
+
+JobOutput = Union[NoOpJobOutputs, ShadowStudyJobOutputs]
 
 
 class CompleteJobInput(BaseModel):
