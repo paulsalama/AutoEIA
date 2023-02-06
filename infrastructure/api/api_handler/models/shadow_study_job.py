@@ -2,12 +2,17 @@ from typing import Literal, Optional
 
 from pydantic import AnyUrl, BaseModel
 
-from .job import BaseJob, JobType
+from .job import BaseJob, JobType, BaseJobInput
 
 
 class ShadowStudyJobInputs(BaseModel):
     building_3d_model_uri: AnyUrl
     building_location_lat_long: tuple[float, float]
+
+
+class CreateShadowStudyJobInput(BaseJobInput):
+    job_type: Literal[JobType.SHADOW_STUDY] = JobType.SHADOW_STUDY
+    inputs: ShadowStudyJobInputs
 
 
 class ShadowStudyJobOutputs(BaseModel):

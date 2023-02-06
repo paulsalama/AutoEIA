@@ -3,13 +3,13 @@ from uuid import uuid4
 import boto3
 from pydantic import parse_obj_as
 
-from infrastructure.api.api_handler.index import (
-    CompleteJobInput,
+from infrastructure.api.api_handler.models import (
     CreateJobInput,
+    CompleteJobInput,
     JobStatus,
     JobType,
-    create_app,
 )
+from infrastructure.api.api_handler.index import create_app
 
 JOB_TABLE_NAME = "AutoEIAStack-TableCD117FA1-1IYIL0D055FND"
 
